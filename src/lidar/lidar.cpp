@@ -64,14 +64,23 @@ static uint8_t calcCRC8(const uint8_t* data, size_t len) {
 // Read scan method
 void LidarParser::readScan() {
     if (fd_ < 0) {
-        valid_ = false; 
+        valid_ = false;
+        scan_.validScan = false;
         return; 
     }
 
     // Read the bytes until theres a start of a packet (header is 0x54)
     uint8_t byte;
+
     while (true) {
-        read(fd_, &byte, 1);
+        ssize_t bytesRead = read(fd_, &byte, 1);
+
+        if (bytesRead != 1) {
+            valid_ = false; 
+            scan_.validScan = false; 
+            return; 
+        }
+
         if (byte == 0x54) {
             break; 
         }
@@ -80,12 +89,21 @@ void LidarParser::readScan() {
     // Remaining packet is 47 bytes total (including header)
     uint8_t packet[47]; 
     packet[0] = 0x54; 
-    read(fd_, &packet[1], 46); 
+
+    ssize_t bytesRead = read(fd_, &packet[1], 46); 
+
+    // Ensure packet size checks out
+    if (bytesRead != 46) {
+        valid_ = false; 
+        scan_.validScan = false;
+        return; 
+    }
 
     // Verify the CRC checksum
     uint8_t result = calcCRC8(packet, 46);
     if (result != packet[46]) {
         valid_ = false; 
+        scan_.validScan = false; 
         return; 
     }
 
@@ -97,16 +115,28 @@ void LidarParser::readScan() {
     uint16_t rawEnd = packet[42] | (packet[43] << 8); 
     float endAngle = rawEnd / 100.0f; 
 
+    // Account for packets that cross 0 degrees
+    float angleDiff = endAngle - startAngle;
+    
+    if (angleDiff < 0.0f) {
+        angleDiff += 360.0f; 
+    }
+
+
     for (int i = 0; i < 12; i++) {
-        uint16_t distance = packet[6 + i*3] | (packet[6 + i*3 + 1] << 8); 
-        uint8_t intensity = packet[6 + i*3 +2];
+        uint16_t distance = packet[6 + i * 3] | (packet[6 + i * 3 + 1] << 8); 
+        uint8_t intensity = packet[6 + i * 3 + 2];
 
         // Compute the angle
-        float angle = startAngle + i * (endAngle - startAngle) / 11.0f; 
+        float angle = startAngle + static_cast<float>(i) * (angleDiff) / 11.0f;
+
+        if (angle >= 360.0f) {
+            angle -= 360.0f; 
+        }
 
         int index = static_cast<int>(angle) % 360;
-        // Add to scan_.distances 
-        scan_.distances[index] = static_cast<float>(distance); 
+        // Add to scan_.distances (in meters)
+        scan_.distances[index] = static_cast<float>(distance) / 1000.0f; 
 
         // Add intensity to scan_.intensity
         scan_.intensity[index] = intensity; 
