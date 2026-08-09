@@ -73,12 +73,10 @@ void LidarParser::readScan() {
     uint8_t byte;
 
     while (true) {
-        ssize_t bytesRead = read(fd_, &byte, 1);
-
-        if (bytesRead != 1) {
-            valid_ = false; 
-            scan_.validScan = false; 
-            return; 
+        if (!readExact(&byte, 1)) {
+            valid_ = false;
+            scan_.validScan = false;
+            return;
         }
 
         if (byte == 0x54) {
@@ -90,13 +88,11 @@ void LidarParser::readScan() {
     uint8_t packet[47]; 
     packet[0] = 0x54; 
 
-    ssize_t bytesRead = read(fd_, &packet[1], 46); 
-
     // Ensure packet size checks out
-    if (bytesRead != 46) {
-        valid_ = false; 
-        scan_.validScan = false;
-        return; 
+    if (!readExact(&packet[1], 46)) {
+        valid_ = false;
+        scan_.validScan = false; 
+        return;
     }
 
     // Verify the CRC checksum
@@ -147,6 +143,23 @@ void LidarParser::readScan() {
     scan_.validScan = true;
     valid_ = true;  
 
+}
+
+// readExtract method
+bool LidarParser::readExact(uint8_t* buffer, size_t length) {
+    size_t totalRead = 0; 
+
+    while (totalRead < length) {
+        ssize_t bytesRead = read(fd_, buffer + totalRead, length - totalRead);
+
+        if (bytesRead <= 0) {
+            return false; 
+        }
+
+        totalRead += static_cast<size_t>(bytesRead);
+    }
+
+    return true;
 }
 
 // validCheck method
