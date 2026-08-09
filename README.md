@@ -1,0 +1,1 @@
+**STATUS:** Early prototype under active development. Current work focuses on sensor reliablity, fail-safe navigation, and simulation/testing before higher-level autonomous navigation is added.

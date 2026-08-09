@@ -1,0 +1,19 @@
+#pragma once
+#include <string>
+#include "../utils/types.h"
+
+class LidarParser {
+private:
+    int fd_;
+    std::string port_; 
+    bool valid_;
+    LidarScan scan_;
+
+public:
+    LidarParser(const std::string& port);
+    ~LidarParser(); 
+    void openPort(); 
+    void readScan(); 
+    LidarScan getLidarData(); 
+    bool validCheck(); 
+}; 

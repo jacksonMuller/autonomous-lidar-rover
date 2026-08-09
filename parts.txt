@@ -1,0 +1,7 @@
+Raspberry PI 4 --> Raspberry Pi OS Lite (64-bit)
+LiDAR Camera: WayPonDEV FHL-LD19 360 Degree 2D Lidar Distance Sensor Kit, 10Hz Scan Rate and 12m Distance Lidar Scanner Module for Smart Obstacle/Robot/Maker Education Indoor/Outdoor
+Car Chassis: LewanSoul 4WD Smart Chassis Car Kit with Aluminum Alloy Chassis, TT Motor, 66mm Wheels, Robotic Moving Platform (Black, Unassembled)
+Motor Driver: Motor Driver HAT for Raspberry Pi Onboard PCA9685 TB6612FNG Drive Two DC Motors I2C Interface 5V 3A Can be Stackable up to 32 This Modules
+Bread Board Kit: REXQualis Electronics Component Fun Kit w/Power Supply Module, Jumper Wire, 830 tie-Points Breadboard, Precision Potentiometer,Resistor Compatible with Arduino, Raspberry Pi, STM32
+Wheel Batterys: Pack of 2 4 AA 6V Battery Holder with Switch, 4X 1.5V AA Battery Holder with Leads and Switch
+Raspberry Pi 4 Power Supply: Anker Power Bank(PowerCore 10K), Compact Travel-Ready 10,000mAh Battery Pack with PowerIQ Charging Technology, 5V/3A High-Speed Charging for iPhone, iPad,and More (1, Black)
