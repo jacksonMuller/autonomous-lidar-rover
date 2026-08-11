@@ -32,11 +32,11 @@ TEST_CASE("obstacleLeft (nothing seen in forward arc)") {
 TEST_CASE("polarToCartesian test") {
     point result = LidarScanUtils::cartesianPosition(0.0f, 1.0f);
 
-    REQUIRE(result.x == Catch::Approx(1.0f).epsilon(0.1f) && result.y == Catch::Approx(0.0f).epsilon(0.1f));
-
+    REQUIRE(result.x == Catch::Approx(1.0f).epsilon(0.1f));
+    REQUIRE(result.y == Catch::Approx(0.0f).epsilon(0.1f));
 }
 
-// Check for invalid readings
+// Check for invalid readings (test #5)
 TEST_CASE("Ensure invalid readings are properly filtered") {
     LidarScan scan;
     scan.distances[2] = 0.0f;

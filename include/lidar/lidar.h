@@ -8,6 +8,7 @@ private:
     std::string port_; 
     bool valid_;
     LidarScan scan_;
+    bool readExact(uint8_t* buffer, size_t length);
 
 public:
     LidarParser(const std::string& port);

@@ -17,10 +17,10 @@ bool LidarScanUtils::validReading(float distance, uint8_t intensity) {
     // 2) Distance is 0
     // 3) intensity is less than 100 (poor scan)
 
-    // Convert LiDAR max distance reading (12000mm)
-    const float MAX_LIDAR_READ = 12000.0;
+    // Convert LiDAR max distance reading (12m)
+    constexpr float MAX_LIDAR_RANGE_M = 12.0;
 
-    if (distance > MAX_LIDAR_READ || distance <= 0) {
+    if (distance > MAX_LIDAR_RANGE_M || distance <= 0.0f) {
         return false; 
     }
 

@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
+
 project(lidar_rover LANGUAGES CXX)
+
+include(CTest)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -27,4 +31,6 @@ add_executable(lidar_rover src/main.cpp)
 target_include_directories(lidar_rover PRIVATE include/)
 target_link_libraries(lidar_rover PRIVATE utils lidar nav motor)
 
-add_subdirectory(tests)
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()

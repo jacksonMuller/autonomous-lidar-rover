@@ -1,14 +1,15 @@
 #pragma once
 #include "../utils/i2c.h"
+#include "i_motor_controller.h"
 
-class MotorController {
+class MotorController : public IMotorController {
 public: 
     MotorController(I2C& device);
-    void forward(float speed); 
+    void forward(float speed) override;
     void backward(float speed); 
-    void turnLeft(float speed); 
-    void turnRight(float speed); 
-    void stop(); 
+    void turnLeft(float speed) override; 
+    void turnRight(float speed) override; 
+    void stop() override; 
 
 private: 
     struct MotorChannel {
