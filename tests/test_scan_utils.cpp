@@ -36,7 +36,7 @@ TEST_CASE("polarToCartesian test") {
     REQUIRE(result.y == Catch::Approx(0.0f).epsilon(0.1f));
 }
 
-// Check for invalid readings
+// Check for invalid readings (test #5)
 TEST_CASE("Ensure invalid readings are properly filtered") {
     LidarScan scan;
     scan.distances[2] = 0.0f;

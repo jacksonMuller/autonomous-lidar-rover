@@ -10,6 +10,25 @@ enum class NavDecision {
     TurnRight
 };
 
+enum class RoverState {
+    Idle,
+    Navigating,
+    AvoidingObstacle,
+    SensorFault,
+    Stopped
+};
+
+enum class NavStatus {
+    Normal,
+    SensorFault
+}; 
+
+struct NavigationResult {
+    NavDecision decision; 
+    NavStatus status;
+};
+
+
 
 
 class Navigator {
@@ -46,13 +65,17 @@ private:
     const int REAR_ANGLE_START = 135; 
     const int REAR_ANGLE_END = 225;
 
-    MotorController& controller_;
+    IMotorController& controller_;
+
+    RoverState state_ = RoverState::Idle; 
 
 public: 
-    Navigator(MotorController& controller): controller_(controller) {}
+    Navigator(IMotorController& controller): controller_(controller) {}
 
     void update(const LidarScan& scan); 
 
-    static NavDecision evaluateScan(const LidarScan& scan);
+    static NavigationResult evaluateScan(const LidarScan& scan);
+
+    RoverState getState() const;
 };
  

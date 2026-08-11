@@ -5,48 +5,58 @@
 
 void Navigator::update(const LidarScan& scan) {
     // Determine which action to take
-    NavDecision decision = evaluateScan(scan); 
+    NavigationResult result = evaluateScan(scan); 
 
-    // Tell the rover which action to take
-    switch(decision) {
+    // Sensor failure always puts the rover into a safe state
+    if (result.status == NavStatus::SensorFault) {
+        state_ = RoverState::SensorFault; 
+        controller_.stop();
+        return; 
+    }
+
+    switch (result.decision) {
         case NavDecision::Forward:
+            state_ = RoverState::Navigating;
             controller_.forward(DRIVE_SPEED);
             break;
         
         case NavDecision::TurnLeft:
-            controller_.turnLeft(DRIVE_SPEED); 
+            state_ = RoverState::AvoidingObstacle;
+            controller_.turnLeft(TURN_SPEED); 
             break;
         
         case NavDecision::TurnRight:
-            controller_.turnRight(DRIVE_SPEED); 
+            state_ = RoverState::AvoidingObstacle;
+            controller_.turnRight(TURN_SPEED); 
             break;
-        
+
         case NavDecision::Stop:
         default:
+            state_ = RoverState::Stopped;
             controller_.stop(); 
-            break; 
-
+            break;
+        
     }
 
 }
 
-NavDecision Navigator::evaluateScan(const LidarScan& scan) {
+NavigationResult Navigator::evaluateScan(const LidarScan& scan) {
     constexpr float DISTANCE_EPSILON = 0.001f; 
     
 
     if (!scan.validScan) {
-        return NavDecision::Stop;
+        return {NavDecision::Stop, NavStatus::SensorFault};
     }
 
     float forwardClosestDistance = LidarScanUtils::closestDistance(FORWARD_ANGLE_START, FORWARD_ANGLE_END, scan);
     // Check if forwardClosestDistance is infinity
     if (!std::isfinite(forwardClosestDistance)) {
-        return NavDecision::Stop;
+        return {NavDecision::Stop, NavStatus::SensorFault};
     }
     
     // Return Forward if the path ahead is clear
     if (forwardClosestDistance >= SAFE_DISTANCE_FORWARD) {
-        return NavDecision::Forward; 
+        return {NavDecision::Forward, NavStatus::Normal}; 
     } 
 
     // Check Left & Right Distances
@@ -61,32 +71,55 @@ NavDecision Navigator::evaluateScan(const LidarScan& scan) {
 
     // No trustworthy side readings
     if (!leftValid && !rightValid) {
-        return NavDecision::Stop; 
+        return {NavDecision::Stop, NavStatus::SensorFault}; 
     }
 
     // Check if right and left side are safe
     bool rightSafe = rightValid && rightClosestDistance > SAFE_DISTANCE_TURN + DISTANCE_EPSILON;
     bool leftSafe = leftValid && leftClosestDistance > SAFE_DISTANCE_TURN + DISTANCE_EPSILON; 
 
-    // Check if neither side is safe
-    if (!rightSafe && !leftSafe){
-        return NavDecision::Stop;
+    // If either side has missing sensor data only continue if other side is known to be safe.
+    if (!leftValid || !rightValid) {
+
+        // Left is valid and safe then we turn left
+        if (leftSafe) {
+            return {NavDecision::TurnLeft, NavStatus::Normal}; 
+        }
+
+        // Right is valid and safe then we turn right
+        if (rightSafe) {
+            return {NavDecision::TurnRight, NavStatus::Normal};
+        }
+
+        // Missing sensor data prevents us from chosing a trustworthy direction
+        return {NavDecision::Stop, NavStatus::SensorFault};
     }
 
-    // Only right side is safe
-    if (rightSafe && !leftSafe) {
-        return NavDecision::TurnRight;
+    // Left and Right readings are valid
+
+    // Check if both sides are physically blocked
+    if (!leftSafe && !rightSafe) {
+        return {NavDecision::Stop, NavStatus::Normal}; 
     }
 
-    // Only left side is safe
+    // Only right is safe
+    if (!leftSafe && rightSafe) {
+        return {NavDecision::TurnRight, NavStatus::Normal}; 
+    }
+
+    // Only left is safe
     if (leftSafe && !rightSafe) {
-        return NavDecision::TurnLeft;
+        return {NavDecision::TurnLeft, NavStatus::Normal}; 
     }
 
-    // If both are safe, then we chose the side with more clearance
+    // Both sides are safe, so choose greater clearance
     if (leftClosestDistance > rightClosestDistance) {
-        return NavDecision::TurnLeft;
+        return {NavDecision::TurnLeft, NavStatus::Normal}; 
     }
 
-    return NavDecision::TurnRight;
+    return {NavDecision::TurnRight, NavStatus::Normal};
+}
+
+RoverState Navigator::getState() const {
+    return state_; 
 }
