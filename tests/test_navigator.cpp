@@ -5,8 +5,6 @@
 #include "sim/scan_injector.h"
 #include "utils/types.h"
 
-#include <iostream>
-
 class FakeMotorController : public IMotorController {
 public:
     enum class Command {
@@ -114,12 +112,6 @@ TEST_CASE("Navigator stops when all sides are blocked") {
     LidarScan scan = ScanInjector::surrounded(); 
 
     NavigationResult result = Navigator::evaluateScan(scan);
-
-
-    std::cerr
-        << "Decision: " << static_cast<int>(result.decision)
-        << " Status: " << static_cast<int>(result.status)
-        << '\n';
 
     
     REQUIRE(result.decision == NavDecision::Stop); 
