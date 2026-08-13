@@ -1,8 +1,10 @@
-#include "../../include/utils/scan_utils.h"
-#include <limits>
+#include "utils/scan_utils.h"
+#include "lidar/lidar_constants.h"
 
-point LidarScanUtils::cartesianPosition(float angle, float distance) {
-    float angleRadians = angle * (M_PI / 180);
+point LidarScanUtils::cartesianPosition(float angleDegrees, float distance) {
+    // Convert angle from degrees into radians
+    constexpr float PI = 3.14159265358979323846f;
+    float angleRadians = (PI / 180) * angleDegrees;
 
     // Compute x and y values
     float x = distance * std::cos(angleRadians);
@@ -17,10 +19,7 @@ bool LidarScanUtils::validReading(float distance, uint8_t intensity) {
     // 2) Distance is 0
     // 3) intensity is less than 100 (poor scan)
 
-    // Convert LiDAR max distance reading (12m)
-    constexpr float MAX_LIDAR_RANGE_M = 12.0;
-
-    if (distance > MAX_LIDAR_RANGE_M || distance <= 0.0f) {
+    if (distance > LidarConstants::MAX_RANGE_M || distance <= 0.0f) {
         return false; 
     }
 

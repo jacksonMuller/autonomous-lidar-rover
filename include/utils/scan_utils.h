@@ -1,7 +1,5 @@
 #pragma once
 #include "types.h"
-#include <cmath>
-#include <limits>
 #include <cstdint>
 
 struct point {

@@ -1,6 +1,6 @@
 #pragma once
-#include "../motor/motor.h"
-#include "../utils/types.h"
+#include "motor/motor.h"
+#include "utils/types.h"
 
 
 enum class NavDecision {

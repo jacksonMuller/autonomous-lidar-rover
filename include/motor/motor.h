@@ -1,5 +1,5 @@
 #pragma once
-#include "../utils/i2c.h"
+#include "utils/i2c.h"
 #include "i_motor_controller.h"
 
 class MotorController : public IMotorController {
