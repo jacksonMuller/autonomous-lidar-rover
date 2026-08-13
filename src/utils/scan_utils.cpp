@@ -1,5 +1,7 @@
 #include "utils/scan_utils.h"
 #include "lidar/lidar_constants.h"
+#include <cmath>
+
 
 point LidarScanUtils::cartesianPosition(float angleDegrees, float distance) {
     // Convert angle from degrees into radians
