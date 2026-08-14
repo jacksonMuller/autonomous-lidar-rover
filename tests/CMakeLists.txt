@@ -12,6 +12,9 @@ add_executable(lidar_rover_tests
   test_scan_utils.cpp
   test_navigator.cpp
   scan_injector.cpp
+  test_occupancy_grid.cpp
+  test_lidar_mapper.cpp
+
 )
 
 target_include_directories(lidar_rover_tests PRIVATE
@@ -21,6 +24,7 @@ target_include_directories(lidar_rover_tests PRIVATE
 target_link_libraries(lidar_rover_tests PRIVATE
   utils
   nav
+  mapping
   Catch2::Catch2WithMain
 )
 

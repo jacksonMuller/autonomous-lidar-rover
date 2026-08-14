@@ -8,6 +8,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Occupancy Grid (no dependencies)
+add_library(mapping STATIC src/mapping/occupancy_grid.cpp src/mapping/lidar_mapper.cpp)
+target_include_directories(mapping PRIVATE include/)
+
 # Utils library (no dependencies)
 add_library(utils STATIC src/utils/I2c.cpp src/utils/scan_utils.cpp)
 target_include_directories(utils PRIVATE include/)
