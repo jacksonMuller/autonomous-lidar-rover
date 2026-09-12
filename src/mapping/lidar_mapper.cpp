@@ -14,7 +14,7 @@ bool LidarMapper::addMeasurement(float angleDegrees, float distanceMeters) {
     }
 
     // Ensure distance reading is valid
-    if (!std::isfinite(distanceMeters) || distanceMeters < 0.0f || distanceMeters > LidarConstants::MAX_RANGE_M) {
+    if (!std::isfinite(distanceMeters) || distanceMeters <= 0.0f || distanceMeters > LidarConstants::MAX_RANGE_M) {
         return false; 
     }
 
@@ -30,8 +30,21 @@ bool LidarMapper::addMeasurement(float angleDegrees, float distanceMeters) {
         return false;
     }
 
+    
+
     grid_.setCell(gridX, gridY, CellState::Occupied);
 
     return true;
 
+}
+
+void LidarMapper::traceRay(int startX, int startY, int endX, int endY) {
+
+    // Go from rover cell to detected object cell and mark all cells as free
+    for (int x = startX; x < endX - 1; x++) {
+
+        if (grid_.isInBounds(x, startY)) {
+            grid_.setCell(x, startY, CellState::Free); 
+        }
+    }
 }

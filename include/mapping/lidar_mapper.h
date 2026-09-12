@@ -11,5 +11,6 @@ public:
 
 private:
     OccupancyGrid& grid_;
+    void traceRay(int startX, int startY, int endX, int endY);
 
 };
