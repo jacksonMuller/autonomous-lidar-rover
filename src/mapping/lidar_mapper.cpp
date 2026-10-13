@@ -4,6 +4,7 @@
 #include "utils/scan_utils.h"
 #include <cmath>
 
+
 LidarMapper::LidarMapper(OccupancyGrid& grid): grid_(grid) {}
 
 bool LidarMapper::addMeasurement(float angleDegrees, float distanceMeters) {
@@ -29,8 +30,17 @@ bool LidarMapper::addMeasurement(float angleDegrees, float distanceMeters) {
     if (!converted) {
         return false;
     }
-
     
+    int roverGridX; 
+    int roverGridY; 
+    
+    bool convertedRoverPos = grid_.worldToGrid(0.0f, 0.0f, roverGridX, roverGridY); 
+
+    if (!convertedRoverPos) {
+        return false; 
+    }
+
+    traceRay(roverGridX, roverGridY, gridX, gridY); 
 
     grid_.setCell(gridX, gridY, CellState::Occupied);
 
@@ -39,12 +49,49 @@ bool LidarMapper::addMeasurement(float angleDegrees, float distanceMeters) {
 }
 
 void LidarMapper::traceRay(int startX, int startY, int endX, int endY) {
+    int currX = startX; 
+    int currY = startY;
 
-    // Go from rover cell to detected object cell and mark all cells as free
-    for (int x = startX; x < endX - 1; x++) {
+    int deltaX = std::abs(endX - startX);
+    int deltaY = std::abs(endY - startY); 
 
-        if (grid_.isInBounds(x, startY)) {
-            grid_.setCell(x, startY, CellState::Free); 
+    int stepX; 
+    int stepY; 
+
+    if (startX < endX) {
+        stepX = 1; 
+    } else if (startX > endX) {
+        stepX = -1; 
+    } else {
+        stepX = 0; 
+    }
+
+    if (startY < endY) {
+        stepY = 1; 
+    } else if (startY > endY) {
+        stepY = -1; 
+    } else {
+        stepY = 0; 
+    }
+
+    int error = deltaX - deltaY; 
+
+    while (currX != endX || currY != endY) {
+        if (grid_.isInBounds(currX, currY)) {
+            grid_.setCell(currX, currY, CellState::Free);
+        }
+
+        int doubledError = 2 * error; 
+
+        if (doubledError > -deltaY) {
+            error -= deltaY; 
+            currX += stepX;
+        }
+
+        if (doubledError < deltaX) {
+            error += deltaX;
+            currY += stepY;
         }
     }
+
 }
