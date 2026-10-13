@@ -172,3 +172,28 @@ TEST_CASE("Ensure addMeasurement correctly places ray at 30 degrees") {
     REQUIRE(grid.getCell(133, 130) == CellState::Unknown); 
 
 }
+
+TEST_CASE("Ensure addMeasurement correctly places ray at 60 degrees") {
+    OccupancyGrid grid(250, 250, 0.1f); 
+    LidarMapper mapper(grid); 
+
+
+    bool result = mapper.addMeasurement(60.0f, 0.9f);
+
+    REQUIRE(result); 
+
+    REQUIRE(grid.getCell(125, 125) == CellState::Free); 
+    REQUIRE(grid.getCell(126, 126) == CellState::Free); 
+    REQUIRE(grid.getCell(126, 127) == CellState::Free); 
+    REQUIRE(grid.getCell(127, 128) == CellState::Free); 
+    REQUIRE(grid.getCell(127, 129) == CellState::Free); 
+    REQUIRE(grid.getCell(128, 130) == CellState::Free); 
+    REQUIRE(grid.getCell(128, 131) == CellState::Free); 
+    REQUIRE(grid.getCell(129, 132) == CellState::Occupied); 
+
+    // Ensure neighboring cell is still unknown
+    REQUIRE(grid.getCell(126, 125) == CellState::Unknown);
+    REQUIRE(grid.getCell(130, 133) == CellState::Unknown);
+
+
+}
