@@ -173,6 +173,7 @@ TEST_CASE("Ensure addMeasurement correctly places ray at 30 degrees") {
 
 }
 
+// Test #41
 TEST_CASE("Ensure addMeasurement correctly places ray at 60 degrees") {
     OccupancyGrid grid(250, 250, 0.1f); 
     LidarMapper mapper(grid); 
@@ -196,4 +197,19 @@ TEST_CASE("Ensure addMeasurement correctly places ray at 60 degrees") {
     REQUIRE(grid.getCell(130, 133) == CellState::Unknown);
 
 
+}
+
+// Test #42
+TEST_CASE("Ensure addMeasurement rejects a measurement whose endpoint falls outside the occupancy grid") {
+    OccupancyGrid grid(10, 10, 0.1f);
+    LidarMapper mapper(grid);
+
+    bool result = mapper.addMeasurement(0.0f, 1.0f);
+
+    // The endpoint is outside this small occupancy grid.
+    REQUIRE_FALSE(result);
+
+    // Confirm that the rejected measurement did not modify the grid.
+    REQUIRE(grid.getCell(5, 5) == CellState::Unknown);
+    REQUIRE(grid.getCell(9, 5) == CellState::Unknown);
 }
